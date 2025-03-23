@@ -7,7 +7,7 @@ import (
 
 	"github.com/Edestus789/sql-migrator/app"
 	"github.com/Edestus789/sql-migrator/config"
-	"./logger/logger"
+	"./logger"
 	"github.com/Edestus789/sql-migrator/storage"
 )
 
