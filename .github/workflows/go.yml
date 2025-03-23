@@ -77,7 +77,7 @@ jobs:
 
       - name: make build
         run: make build
-        working-directory: /home/runner/work/sql-migrator
+        working-directory: /home/runner/work/sql-migrator/
 
       - name: make test
         run: make test
