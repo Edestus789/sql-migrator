@@ -3,9 +3,10 @@ package storage
 import (
 	"context"
 	"errors"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4"
 	"time"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/Edestus789/sql-migrator/logger"
 )
 
@@ -35,7 +36,7 @@ const (
 
 type PostgresStorage struct {
 	connString string
-	pool       *pgx.Pool
+	pool       *pgxpool.Pool
 	logger     logger.Logger
 }
 
