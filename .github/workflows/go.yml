@@ -80,10 +80,6 @@ jobs:
         working-directory: ./
 
       - name: make build
-        run: ls -la
-        working-directory: ./cmd
-
-      - name: make build
         run: pwd
         working-directory: ./
 
