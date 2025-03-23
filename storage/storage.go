@@ -55,7 +55,7 @@ func New(connString string, logger logger.Logger) *PostgresStorage {
 func (storage *PostgresStorage) Connect(ctx context.Context) error {
 	storage.logger.Info("Connecting to the database")
 
-	pool, err := pgx.Connect(ctx, storage.connString)
+	pool, err := pgxpool.Connect(ctx, storage.connString)
 	if err != nil {
 		storage.logger.Error("Failed to connect to the database: %v", err)
 		return err
