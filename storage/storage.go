@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"workspace/resurse/logger"
+	"./resurse/logger"
 )
 
 // advisoryLockID — это идентификатор, используемый для создания уникальной блокировки.
