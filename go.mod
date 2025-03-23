@@ -4,7 +4,6 @@ go 1.23.7
 
 require (
 	github.com/jackc/pgx/v4 v4.18.3
-	github.com/juliazadorozhnaya/sql-migrator v0.0.0-20240815072815-f84cad83f14b
 	github.com/lib/pq v1.10.9
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/viper v1.20.0
@@ -38,5 +37,6 @@ require (
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
