@@ -75,7 +75,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-
+      - name: make build
+        run: make build
+        working-directory: ./
 
       - name: make test
         run: make test
