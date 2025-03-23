@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
-	"github.com/jackc/pgx/v4"
+
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -175,13 +175,13 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		statusStr        string
 		statusChangeTime time.Time
 	)
-    var pgErr pgx.ErrNoRow
+    
 	err := row.Scan(&name, &statusStr, &version, &statusChangeTime)
 	if err != nil {
-		if err == pgErrs {
-			storage.logger.Warn("Миграция со статусом %s не найдена", status)
-			return nil, ErrMigrationNotFound
-		}
+		// if err == pgx.ErrNoRows {
+		// 	storage.logger.Warn("Миграция со статусом %s не найдена", status)
+		// 	return nil, ErrMigrationNotFound
+		// }
 		storage.logger.Error("Ошибка при получении последней миграции со статусом %s: %v", status, err)
 		return nil, err
 	}
