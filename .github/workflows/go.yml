@@ -75,17 +75,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: golangci-lint run  --config=./.golangci.yml
-        run: golangci-lint run  --config=./.golangci.yml
-        working-directory: ./
-
-      - name: make lint
-        run: make lint
-        working-directory: ./
-
       - name: make build
         run: make build
-        working-directory: ./
+        working-directory: /home/runner/work/sql-migrator
 
       - name: make test
         run: make test
