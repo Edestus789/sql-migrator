@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"resurse/logger"
+	"workspace/resurse/logger"
 	"github.com/Edestus789/sql-migrator/processes"
 	"github.com/Edestus789/sql-migrator/storage"
 )
