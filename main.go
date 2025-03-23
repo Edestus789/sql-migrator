@@ -13,14 +13,22 @@ import (
 )
 
 var (
-	ErrInvalidFlagNumber = errors.New("invalid flag number")
-
 	configPath    string
 	path          string
 	database      string
 	migrationName string
 	command       string
 )
+
+// var (
+// 	ErrInvalidFlagNumber = errors.New("invalid flag number")
+
+// 	configPath    string
+// 	path          string
+// 	database      string
+// 	migrationName string
+// 	command       string
+// )
 
 func init() {
 	flag.StringVar(&configPath, "config", "config.yaml", "Path to config file")
