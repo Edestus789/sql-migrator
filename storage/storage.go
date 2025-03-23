@@ -35,7 +35,7 @@ const (
 
 type PostgresStorage struct {
 	connString string
-	pool       *pgxpool.Pool
+	pool       *pgx.Pool
 	logger     logger.Logger
 }
 
