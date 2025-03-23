@@ -165,14 +165,14 @@ func createMigrationFiles(filePath string, version int, name string, logger logg
 		if err != nil {
 			return err
 		}
-		logger.Info(upFile + " created")
+		logger.Info(upFile + " created_upFile")
 
 		downFile := path.Join(filePath, fmt.Sprintf("%05d_%s_down.sql", version, name))
 		err = os.WriteFile(downFile, []byte(""), 0644)
 		if err != nil {
 			return err
 		}
-		logger.Info(downFile + " created")
+		logger.Info(downFile + " created_downFile")
 	case "go":
 		upFile := path.Join(filePath, fmt.Sprintf("%05d_%s_up.go", version, name))
 		upContent := `package main
@@ -208,7 +208,7 @@ func Up(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		logger.Info(upFile + " created")
+		logger.Info(upFile + " created_upFile")
 
 		downFile := path.Join(filePath, fmt.Sprintf("%05d_%s_down.go", version, name))
 		downContent := `package main
@@ -238,7 +238,7 @@ func Down(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		logger.Info(downFile + " created")
+		logger.Info(downFile + " created_downFile")
 	default:
 		return errors.New("unsupported migration type")
 	}
