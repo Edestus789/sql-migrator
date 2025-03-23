@@ -77,7 +77,7 @@ jobs:
 
       - name: make build
         run: make build
-        working-directory: ./
+        working-directory: ./cmd
 
       - name: make test
         run: make test
