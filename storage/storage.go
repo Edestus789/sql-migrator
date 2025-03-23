@@ -175,10 +175,10 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		statusStr        string
 		statusChangeTime time.Time
 	)
-
+    var pgErr pgx.ErrNoRow
 	err := row.Scan(&name, &statusStr, &version, &statusChangeTime)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if err == pgErrs {
 			storage.logger.Warn("Миграция со статусом %s не найдена", status)
 			return nil, ErrMigrationNotFound
 		}
