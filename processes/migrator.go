@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"./resurse/logger"
+	"./logger/logger"
 	"github.com/Edestus789/sql-migrator/storage"
 )
 
