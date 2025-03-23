@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/juliazadorozhnaya/sql-migrator/logger"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/logger"
+	"github.com/Edestus789/sql-migrator/storage"
 	"github.com/stretchr/testify/assert"
 )
 

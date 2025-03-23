@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/juliazadorozhnaya/sql-migrator/logger"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/logger"
+	"github.com/Edestus789/sql-migrator/storage"
 )
 
 // Интерфейс IMigration определяет методы для работы с миграциями

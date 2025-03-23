@@ -11,9 +11,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/juliazadorozhnaya/sql-migrator/app"
-	"github.com/juliazadorozhnaya/sql-migrator/logger"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/app"
+	"github.com/Edestus789/sql-migrator/logger"
+	"github.com/Edestus789/sql-migrator/storage"
 	_ "github.com/lib/pq"
 )
 

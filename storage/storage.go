@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/juliazadorozhnaya/sql-migrator/logger"
+	"github.com/Edestus789/sql-migrator/logger"
 )
 
 // advisoryLockID — это идентификатор, используемый для создания уникальной блокировки.

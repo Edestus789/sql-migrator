@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/juliazadorozhnaya/sql-migrator/logger"
-	"github.com/juliazadorozhnaya/sql-migrator/processes"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/logger"
+	"github.com/Edestus789/sql-migrator/processes"
+	"github.com/Edestus789/sql-migrator/storage"
 )
 
 type App interface {
@@ -179,7 +179,7 @@ func createMigrationFiles(filePath string, version int, name string, logger logg
 
 import (
 	"context"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/storage"
 )
 
 func Up(ctx context.Context) error {
@@ -215,7 +215,7 @@ func Up(ctx context.Context) error {
 
 import (
 	"context"
-	"github.com/juliazadorozhnaya/sql-migrator/storage"
+	"github.com/Edestus789/sql-migrator/storage"
 )
 
 func Down(ctx context.Context) error {
