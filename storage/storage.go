@@ -6,7 +6,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/Edestus789/sql-migrator/logger"
 )
 
@@ -55,7 +54,7 @@ func New(connString string, logger logger.Logger) *PostgresStorage {
 func (storage *PostgresStorage) Connect(ctx context.Context) error {
 	storage.logger.Info("Connecting to the database")
 
-	pool, err := pgxpool.Connect(ctx, storage.connString)
+	pool, err := pgx.Connect(ctx, storage.connString)
 	if err != nil {
 		storage.logger.Error("Failed to connect to the database: %v", err)
 		return err
