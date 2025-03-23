@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/Edestus789/sql-migrator/app"
-	"github.com/Edestus789/sql-migrator/logger"
+	"sql-migrator/logger"
 	"github.com/Edestus789/sql-migrator/storage"
 	_ "github.com/lib/pq"
 )
