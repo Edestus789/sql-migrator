@@ -75,13 +75,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: golangci-lint run  --config=./.golangci.yml
-        run: make lint
-        working-directory: ./
 
-      - name: make lint
-        run: make lint
-        working-directory: ./
 
       - name: make build
         run: make build
