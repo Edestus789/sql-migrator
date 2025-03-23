@@ -22,7 +22,7 @@ type App interface {
 	Down(path string)
 	Redo(path string)
 	Status()
-	DbVersion()
+	DBVersion()
 }
 
 type Application struct {
@@ -91,9 +91,9 @@ func (app *Application) Status() {
 }
 
 // DbVersion выводит текущую версию базы данных
-func (app *Application) DbVersion() {
+func (app *Application) DBVersion() {
 	app.runSingleCommand(func(migrator *processes.Migrator, ctx context.Context) error {
-		return migrator.DbVersion(ctx)
+		return migrator.DBVersion(ctx)
 	})
 }
 

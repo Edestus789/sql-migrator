@@ -19,7 +19,7 @@ type IMigration interface {
 	Down(context.Context) error
 	Redo(context.Context) error
 	Status(context.Context) error
-	DbVersion(context.Context) error
+	DBVersion(context.Context) error
 }
 
 // Структура Migrator реализует интерфейс IMigration
@@ -305,7 +305,7 @@ func (m *Migrator) Status(ctx context.Context) error {
 }
 
 // Метод для получения текущей версии базы данных
-func (m *Migrator) DbVersion(ctx context.Context) error {
+func (m *Migrator) DBVersion(ctx context.Context) error {
 	lastVersion := 0
 
 	lastMigration, err := m.storage.SelectLastMigrationByStatus(ctx, storage.StatusSuccess)
