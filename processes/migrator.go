@@ -194,10 +194,6 @@ func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration
 			migration.SetStatus(storage.StatusError)
 			migration.SetStatusChangeTime(time.Now())
 			err := m.storage.InsertMigration(ctx, migration)
-			if err != nil {
-				return err
-			}
-
 			m.logger.Error("Ошибка при выполнении SQL-миграции вверх: %v", err)
 			return err
 		}
@@ -236,10 +232,6 @@ func (m *Migrator) downMigration(ctx context.Context, migration storage.IMigrati
 			migration.SetStatus(storage.StatusError)
 			migration.SetStatusChangeTime(time.Now())
 			err := m.storage.InsertMigration(ctx, migration)
-			if err != nil {
-				return err
-			}
-
 			m.logger.Error("Ошибка в downMigration: %v", err)
 			return err
 		}
