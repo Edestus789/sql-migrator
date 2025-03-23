@@ -1,6 +1,6 @@
 module github.com/Edestus789/sql-migrator
 
-go 1.22
+go 1.24.1
 
 require (
 	github.com/jackc/pgx/v4 v4.18.3
