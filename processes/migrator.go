@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Edestus789/sql-migrator/logger"
+	"./logger"
 	"github.com/Edestus789/sql-migrator/storage"
 )
 
@@ -52,8 +52,7 @@ func New(connString storage.SqlStorage, logger logger.Logger) *Migrator {
 func (m *Migrator) Connect(ctx context.Context) error {
 	m.logger.Info("Подключение к базе данных")
 
-	err := m.storage.Connect(ctx)
-	if err != nil {
+	if err := m.storage.Connect(ctx); err != nil {
 		m.logger.Error("Ошибка при подключении: %v", err)
 		return err
 	}
@@ -66,8 +65,7 @@ func (m *Migrator) Connect(ctx context.Context) error {
 func (m *Migrator) Close(ctx context.Context) error {
 	m.logger.Info("Закрытие подключения к базе данных")
 
-	err := m.storage.Close()
-	if err != nil {
+	if err := m.storage.Close(); err != nil {
 		m.logger.Error("Ошибка при закрытии: %v", err)
 		return err
 	}
