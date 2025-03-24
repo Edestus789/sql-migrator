@@ -273,56 +273,57 @@ func getMigrations(filePath string) (map[int]*storage.Migration, error) {
 				return nil, err
 			}
 
-			if regGetUpMigration.MatchString(file.Name()) {
-				if _, ok := migrations[version]; ok {
-					migrations[version].Up = string(sql)
-				} else {
-					migrations[version] = &storage.Migration{
-						Version: version,
-						Name:    migrationName,
-						Up:      string(sql),
+			switch {
+				case regGetUpMigration.MatchString(file.Name()) :
+					if _, ok := migrations[version]; ok {
+						migrations[version].Up = string(sql)
+					} else {
+						migrations[version] = &storage.Migration{
+							Version: version,
+							Name:    migrationName,
+							Up:      string(sql),
+						}
 					}
-				}
-			} else if regGetDownMigration.MatchString(file.Name()) {
-				if _, ok := migrations[version]; ok {
-					migrations[version].Down = string(sql)
-				} else {
-					migrations[version] = &storage.Migration{
-						Version: version,
-						Name:    migrationName,
-						Down:    string(sql),
+				case regGetDownMigration.MatchString(file.Name()) :
+					if _, ok := migrations[version]; ok {
+						migrations[version].Down = string(sql)
+					} else {
+						migrations[version] = &storage.Migration{
+							Version: version,
+							Name:    migrationName,
+							Down:    string(sql),
+						}
 					}
-				}
-			} else if regGetUpGoMigration.MatchString(file.Name()) {
-				if _, ok := migrations[version]; ok {
-					migrations[version].UpGo = func(ctx context.Context) error {
-						return runGoMigration(filePath, file.Name())
-					}
-				} else {
-					migrations[version] = &storage.Migration{
-						Version: version,
-						Name:    migrationName,
-						UpGo: func(ctx context.Context) error {
+				case regGetUpGoMigration.MatchString(file.Name()) :
+					if _, ok := migrations[version]; ok {
+						migrations[version].UpGo = func(ctx context.Context) error {
 							return runGoMigration(filePath, file.Name())
-						},
+						}
+					} else {
+						migrations[version] = &storage.Migration{
+							Version: version,
+							Name:    migrationName,
+							UpGo: func(ctx context.Context) error {
+								return runGoMigration(filePath, file.Name())
+							},
+						}
 					}
-				}
-			} else if regGetDownGoMigration.MatchString(file.Name()) {
-				if _, ok := migrations[version]; ok {
-					migrations[version].DownGo = func(ctx context.Context) error {
-						return runGoMigration(filePath, file.Name())
-					}
-				} else {
-					migrations[version] = &storage.Migration{
-						Version: version,
-						Name:    migrationName,
-						DownGo: func(ctx context.Context) error {
+				case regGetDownGoMigration.MatchString(file.Name()) :
+					if _, ok := migrations[version]; ok {
+						migrations[version].DownGo = func(ctx context.Context) error {
 							return runGoMigration(filePath, file.Name())
-						},
+						}
+					} else {
+						migrations[version] = &storage.Migration{
+							Version: version,
+							Name:    migrationName,
+							DownGo: func(ctx context.Context) error {
+								return runGoMigration(filePath, file.Name())
+							},
+						}
 					}
-				}
-			} else {
-				return nil, ErrInvalidMigrationName
+				default:
+					return nil, ErrInvalidMigrationName
 			}
 		}
 	}
