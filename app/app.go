@@ -161,14 +161,14 @@ func createMigrationFiles(filePath string, version int, name string, logger logg
 	switch migrationType {
 	case "sql":
 		upFile := path.Join(filePath, fmt.Sprintf("%05d_%s_up.sql", version, name))
-		err := os.WriteFile(upFile, []byte(""), 0o644)
+		err := os.WriteFile(upFile, []byte(""), 0o600)
 		if err != nil {
 			return err
 		}
 		logger.Info(upFile + " created_upFile")
 
 		downFile := path.Join(filePath, fmt.Sprintf("%05d_%s_down.sql", version, name))
-		err = os.WriteFile(downFile, []byte(""), 0o644)
+		err = os.WriteFile(downFile, []byte(""), 0o600)
 		if err != nil {
 			return err
 		}
@@ -204,7 +204,7 @@ func Up(ctx context.Context) error {
 	return nil
 }
 `
-		err := os.WriteFile(upFile, []byte(upContent), 0o644)
+		err := os.WriteFile(upFile, []byte(upContent), 0o600)
 		if err != nil {
 			return err
 		}
@@ -234,7 +234,7 @@ func Down(ctx context.Context) error {
 	return nil
 }
 `
-		err = os.WriteFile(downFile, []byte(downContent), 0o644)
+		err = os.WriteFile(downFile, []byte(downContent), 0o600)
 		if err != nil {
 			return err
 		}
