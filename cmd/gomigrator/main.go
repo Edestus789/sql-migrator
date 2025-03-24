@@ -78,7 +78,7 @@ func main() {
 	case "status":
 		application.Status()
 	case "dbversion":
-		application.DbVersion()
+		application.DBVersion()
 	default:
 		fmt.Println("Invalid operation. Use one of the following: create, up, down, redo, status, dbversion.")
 	}
