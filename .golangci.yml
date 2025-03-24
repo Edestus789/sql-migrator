@@ -12,8 +12,9 @@ linters-settings:
             - $all
             - !$test
           allow:
+            - $gostd
             - github.com/stretchr/testify/asser
-            - github.com/rs/zerolog/log
+            - github.com/rs/zerolog
             - github.com/spf13/viper
             - github.com/Edestus789/sql-migrator
 
