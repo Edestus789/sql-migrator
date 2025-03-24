@@ -170,9 +170,9 @@ func (m *Migrator) Down(ctx context.Context) error {
 	return nil
 }
 
-// Вспомогательный метод для выполнения миграции вверх.
-func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration, sql string, upGo func(ctx context.Context) error) error {
-	migration.SetStatus(storage.StatusProcess)
+// Вспомогательный метод для выполнения миграции.
+func (m *Migrator) executeMigration(ctx context.Context, migration storage.IMigration, sql string, goFunc func(ctx context.Context) error, processStatus, successStatus, errorStatus string) error {
+	migration.SetStatus(processStatus)
 	migration.SetStatusChangeTime(time.Now())
 
 	if err := m.storage.InsertMigration(ctx, migration); err != nil {
@@ -180,25 +180,25 @@ func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration
 		return err
 	}
 
-	if upGo != nil {
-		if err := upGo(ctx); err != nil {
-			migration.SetStatus(storage.StatusError)
+	if goFunc != nil {
+		if err := goFunc(ctx); err != nil {
+			migration.SetStatus(errorStatus)
 			migration.SetStatusChangeTime(time.Now())
 			err := m.storage.InsertMigration(ctx, migration)
-			m.logger.Error("Ошибка при выполнении Go-миграции вверх: %v", err)
+			m.logger.Error("Ошибка при выполнении Go-миграции: %v", err)
 			return err
 		}
 	} else if sql != "" {
 		if err := m.storage.Migrate(ctx, sql); err != nil {
-			migration.SetStatus(storage.StatusError)
+			migration.SetStatus(errorStatus)
 			migration.SetStatusChangeTime(time.Now())
 			err := m.storage.InsertMigration(ctx, migration)
-			m.logger.Error("Ошибка при выполнении SQL-миграции вверх: %v", err)
+			m.logger.Error("Ошибка при выполнении SQL-миграции: %v", err)
 			return err
 		}
 	}
 
-	migration.SetStatus(storage.StatusSuccess)
+	migration.SetStatus(successStatus)
 	migration.SetStatusChangeTime(time.Now())
 	if err := m.storage.InsertMigration(ctx, migration); err != nil {
 		m.logger.Error("Ошибка при вставке миграции: %v", err)
@@ -209,42 +209,14 @@ func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration
 	return nil
 }
 
+// Метод для выполнения миграции вверх.
+func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration, sql string, upGo func(ctx context.Context) error) error {
+	return m.executeMigration(ctx, migration, sql, upGo, storage.StatusProcess, storage.StatusSuccess, storage.StatusError)
+}
+
+// Метод для выполнения миграции вниз.
 func (m *Migrator) downMigration(ctx context.Context, migration storage.IMigration, sql string, downGo func(ctx context.Context) error) error {
-	migration.SetStatus(storage.StatusCancellation)
-	migration.SetStatusChangeTime(time.Now())
-
-	if err := m.storage.InsertMigration(ctx, migration); err != nil {
-		m.logger.Error("Ошибка в downMigration: %v", err)
-		return err
-	}
-
-	if downGo != nil {
-		if err := downGo(ctx); err != nil {
-			migration.SetStatus(storage.StatusError)
-			migration.SetStatusChangeTime(time.Now())
-			err := m.storage.InsertMigration(ctx, migration)
-			m.logger.Error("Ошибка в downMigration: %v", err)
-			return err
-		}
-	} else if sql != "" {
-		if err := m.storage.Migrate(ctx, sql); err != nil {
-			migration.SetStatus(storage.StatusError)
-			migration.SetStatusChangeTime(time.Now())
-			err := m.storage.InsertMigration(ctx, migration)
-			m.logger.Error("Ошибка в downMigration: %v", err)
-			return err
-		}
-	}
-
-	migration.SetStatus(storage.StatusCancel)
-	migration.SetStatusChangeTime(time.Now())
-	if err := m.storage.InsertMigration(ctx, migration); err != nil {
-		m.logger.Error("Ошибка в downMigration: %v", err)
-		return err
-	}
-
-	m.logger.Info("Откат миграции %s до версии %d успешно выполнен", migration.GetName(), migration.GetVersion())
-	return nil
+	return m.executeMigration(ctx, migration, sql, downGo, storage.StatusCancellation, storage.StatusCancel, storage.StatusError)
 }
 
 // Метод для выполнения повторной миграции.
