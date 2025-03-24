@@ -21,7 +21,7 @@ func TestCreateMigrationFiles(t *testing.T) {
 	migrationName := "create_users"
 
 	// Создаем директорию миграций
-	if err := os.MkdirAll(migrationDir, 0755); err != nil {
+	if err := os.MkdirAll(migrationDir, 0o755); err != nil {
 		t.Fatalf("Failed to create migrations directory: %v", err)
 	}
 
@@ -50,7 +50,7 @@ func TestUpDownMigration(t *testing.T) {
 	migrationName := "create_users"
 
 	// Создаем директорию миграций
-	if err := os.MkdirAll(migrationDir, 0755); err != nil {
+	if err := os.MkdirAll(migrationDir, 0o755); err != nil {
 		t.Fatalf("Failed to create migrations directory: %v", err)
 	}
 

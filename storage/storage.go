@@ -3,11 +3,10 @@ package storage
 import (
 	"context"
 	"errors"
-
 	"time"
 
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/Edestus789/sql-migrator/logger"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // advisoryLockID — это идентификатор, используемый для создания уникальной блокировки.
@@ -175,7 +174,7 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		statusStr        string
 		statusChangeTime time.Time
 	)
-    
+
 	err := row.Scan(&name, &statusStr, &version, &statusChangeTime)
 	if err != nil {
 		// if err == pgx.ErrNoRows {

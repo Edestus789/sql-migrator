@@ -10,7 +10,7 @@ import (
 	"github.com/Edestus789/sql-migrator/storage"
 )
 
-// Интерфейс IMigration определяет методы для работы с миграциями
+// Интерфейс IMigration определяет методы для работы с миграциями.
 type IMigration interface {
 	Connect(context.Context) error
 	Close(context.Context) error
@@ -22,14 +22,14 @@ type IMigration interface {
 	DBVersion(context.Context) error
 }
 
-// Структура Migrator реализует интерфейс IMigration
+// Структура Migrator реализует интерфейс IMigration.
 type Migrator struct {
 	logger     logger.Logger
 	storage    storage.SQLStorage
 	migrations []storage.Migration
 }
 
-// Определение ошибок для обработки различных ситуаций
+// Определение ошибок для обработки различных ситуаций.
 var (
 	ErrMigrationUp                = errors.New("ошибка выполнения миграции вверх")
 	ErrMigrationDown              = errors.New("ошибка выполнения миграции вниз")
@@ -39,7 +39,7 @@ var (
 	ErrUnexpectedMigrationVersion = errors.New("неожиданная версия миграции")
 )
 
-// Конструктор для создания нового объекта Migrator
+// Конструктор для создания нового объекта Migrator.
 func New(connString storage.SQLStorage, logger logger.Logger) *Migrator {
 	return &Migrator{
 		storage:    connString,
@@ -48,7 +48,7 @@ func New(connString storage.SQLStorage, logger logger.Logger) *Migrator {
 	}
 }
 
-// Метод для подключения к базе данных
+// Метод для подключения к базе данных.
 func (m *Migrator) Connect(ctx context.Context) error {
 	m.logger.Info("Подключение к базе данных")
 
@@ -61,7 +61,7 @@ func (m *Migrator) Connect(ctx context.Context) error {
 	return nil
 }
 
-// Метод для закрытия подключения к базе данных
+// Метод для закрытия подключения к базе данных.
 func (m *Migrator) Close(ctx context.Context) error {
 	m.logger.Info("Закрытие подключения к базе данных")
 
@@ -74,7 +74,7 @@ func (m *Migrator) Close(ctx context.Context) error {
 	return nil
 }
 
-// Метод для создания миграции
+// Метод для создания миграции.
 func (m *Migrator) Create(name, up, down string, upGo, downGo func(ctx context.Context) error) {
 	m.logger.Info("Создание миграции: %s", name)
 	m.migrations = append(m.migrations, storage.Migration{
@@ -89,7 +89,7 @@ func (m *Migrator) Create(name, up, down string, upGo, downGo func(ctx context.C
 	m.logger.Info("Миграция %s создана", name)
 }
 
-// Метод для выполнения миграций вверх
+// Метод для выполнения миграций вверх.
 func (m *Migrator) Up(ctx context.Context) error {
 	m.logger.Info("Начало выполнения миграций")
 
@@ -129,6 +129,7 @@ func (m *Migrator) Up(ctx context.Context) error {
 	m.logger.Info("Миграции успешно выполнены")
 	return nil
 }
+
 func (m *Migrator) Down(ctx context.Context) error {
 	m.logger.Info("Начало выполнения отката миграций")
 
@@ -169,7 +170,7 @@ func (m *Migrator) Down(ctx context.Context) error {
 	return nil
 }
 
-// Вспомогательный метод для выполнения миграции вверх
+// Вспомогательный метод для выполнения миграции вверх.
 func (m *Migrator) upMigration(ctx context.Context, migration storage.IMigration, sql string, upGo func(ctx context.Context) error) error {
 	migration.SetStatus(storage.StatusProcess)
 	migration.SetStatusChangeTime(time.Now())
@@ -246,7 +247,7 @@ func (m *Migrator) downMigration(ctx context.Context, migration storage.IMigrati
 	return nil
 }
 
-// Метод для выполнения повторной миграции
+// Метод для выполнения повторной миграции.
 func (m *Migrator) Redo(ctx context.Context) error {
 	m.logger.Info("Начало выполнения повторной миграции")
 
@@ -280,7 +281,7 @@ func (m *Migrator) Redo(ctx context.Context) error {
 	return nil
 }
 
-// Метод для получения статуса миграций
+// Метод для получения статуса миграций.
 func (m *Migrator) Status(ctx context.Context) error {
 	migrations, err := m.storage.SelectMigrations(ctx)
 	if err != nil {
@@ -302,7 +303,7 @@ func (m *Migrator) Status(ctx context.Context) error {
 	return nil
 }
 
-// Метод для получения текущей версии базы данных
+// Метод для получения текущей версии базы данных.
 func (m *Migrator) DBVersion(ctx context.Context) error {
 	lastVersion := 0
 

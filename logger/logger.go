@@ -16,8 +16,7 @@ type Logger interface {
 	Debug(msg string, v ...interface{})
 }
 
-type ZeroLogger struct {
-}
+type ZeroLogger struct{}
 
 func New() *ZeroLogger {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
