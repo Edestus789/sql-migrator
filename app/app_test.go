@@ -14,7 +14,7 @@ import (
 
 func TestCreateMigrationFiles(t *testing.T) {
 	logger := logger.New()
-	mockStorage := storage.NewMockSqlStorage()
+	mockStorage := storage.NewMockSQLStorage()
 	app := New(logger, mockStorage)
 
 	migrationDir := "../migrations"
@@ -43,7 +43,7 @@ func TestCreateMigrationFiles(t *testing.T) {
 
 func TestUpDownMigration(t *testing.T) {
 	logger := logger.New()
-	mockStorage := storage.NewMockSqlStorage()
+	mockStorage := storage.NewMockSQLStorage()
 	app := New(logger, mockStorage)
 
 	migrationDir := "../migrations"
