@@ -150,7 +150,8 @@ func (m *Migrator) Down(ctx context.Context) error {
 			m.logger.Warn("Нет успешных миграций для отката")
 			return nil
 		}
-		m.logger.Error("Ошибка при получении последней успешной миграции: %v", err)
+		m.logger.Error("Ошибка при получении "+
+			"последней успешной миграции: %v", err)
 		return err
 	}
 
