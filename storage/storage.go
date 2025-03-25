@@ -147,7 +147,7 @@ func (storage *PostgresStorage) SelectMigrations(ctx context.Context) ([]IMigrat
 			return nil, err
 		}
 
-		migrations = append(migrations, NewMigration(name, status, version, statusChangeTime))
+		migrations = append(migrations, CreateMigration(name, status, version, statusChangeTime))
 	}
 
 	if len(migrations) == 0 {
@@ -193,7 +193,7 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		return nil, err
 	}
 
-	return NewMigration(name, statusStr, version, statusChangeTime), nil
+	return CreateMigration(name, statusStr, version, statusChangeTime), nil
 }
 
 func (storage *PostgresStorage) InsertMigration(ctx context.Context, migration IMigration) error {
