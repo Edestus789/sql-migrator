@@ -345,24 +345,35 @@ func processMigrationFile(filePath string, file os.DirEntry, version int, migrat
 	}
 }
 
-func mergeMigrations(existing, new *storage.Migration) {
-	if new.Up != "" {
-		existing.Up = new.Up
+func mergeMigrations(existing, newMigration *storage.Migration) {
+	if newMigration.Up != "" {
+		existing.Up = newMigration.Up
 	}
-	if new.Down != "" {
-		existing.Down = new.Down
+	if newMigration.Down != "" {
+		existing.Down = newMigration.Down
 	}
-	if new.UpGo != nil {
-		existing.UpGo = new.UpGo
+	if newMigration.UpGo != nil {
+		existing.UpGo = newMigration.UpGo
 	}
-	if new.DownGo != nil {
-		existing.DownGo = new.DownGo
+	if newMigration.DownGo != nil {
+		existing.DownGo = newMigration.DownGo
 	}
 }
 
 func runGoMigration(filePath, fileName string) error {
-	cmd := exec.Command("go", "run", path.Join(filePath, fileName))
+	// Проверяем, что fileName содержит только допустимые символы
+	if !isSafeFilename(fileName) {
+		return errors.New("invalid filename")
+	}
+
+	fullPath := path.Join(filePath, fileName)
+	cmd := exec.Command("go", "run", fullPath)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func isSafeFilename(name string) bool {
+	// Проверяем, что имя файла содержит только буквы, цифры, точки, подчеркивания и дефисы
+	return regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`).MatchString(name)
 }

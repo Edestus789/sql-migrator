@@ -206,6 +206,7 @@ func (m *Migrator) executeMigration(ctx context.Context, migration storage.IMigr
 		return err
 	}
 
+	//nolint:lll
 	m.logger.Info("Миграция %s до версии %d успешно применена", migration.GetName(), migration.GetVersion())
 	return nil
 }
@@ -262,6 +263,7 @@ func (m *Migrator) Status(ctx context.Context) error {
 		return ErrGetStatus
 	}
 
+	//nolint:lll
 	border := "._____________________._____________________._____________________."
 	header := fmt.Sprintf("| %-19s | %-19s | %-19s |",
 		"Название", "Статус", "Время")
