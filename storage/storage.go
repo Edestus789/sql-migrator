@@ -13,7 +13,7 @@ import (
 // Он должен быть уникальным для приложения и не пересекаться с другими существующими возможными блокировками в бд.
 const advisoryLockID = 123456
 
-type sqlStorage interface {
+type SQLStorage interface {
 	Connect(ctx context.Context) error
 	Close() error
 	Lock(ctx context.Context) error
@@ -44,7 +44,7 @@ var (
 	ErrMigrationNotFound = errors.New("processes not found")
 )
 
-func NewPostgresStorage(connString string, logger logger.Logger) *PostgresStorage {
+func New(connString string, logger logger.Logger) *PostgresStorage {
 	return &PostgresStorage{
 		connString: connString,
 		logger:     logger,
@@ -92,10 +92,7 @@ func (storage *PostgresStorage) Close() error {
 
 func (storage *PostgresStorage) Lock(ctx context.Context) error {
 	storage.logger.Info("Acquiring advisory lock")
-	_, err := storage.pool.Exec(ctx,
-		"SELECT pg_advisory_lock($1);",
-		advisoryLockID,
-	)
+	_, err := storage.pool.Exec(ctx, "SELECT pg_advisory_lock($1);", advisoryLockID)
 	if err != nil {
 		storage.logger.Error("Failed to acquire advisory lock: %v", err)
 	}
@@ -184,11 +181,7 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		// 	storage.logger.Warn("Миграция со статусом %s не найдена", status)
 		// 	return nil, ErrMigrationNotFound
 		// }
-		storage.logger.Error(
-			"Ошибка при получении последней миграции со статусом %s: %v",
-			status,
-			err,
-		)
+		storage.logger.Error("Ошибка при получении последней миграции со статусом %s: %v", status, err)
 		return nil, err
 	}
 
@@ -206,10 +199,8 @@ func (storage *PostgresStorage) InsertMigration(ctx context.Context, migration I
 				SET Status = $3, StatusChangeTime = $4 
 				WHERE Version = $1 AND Name = $2;
 			ELSE
-				INSERT INTO schema_migrations 
-					(Version, Name, Status, StatusChangeTime)
-				VALUES 
-					($1, $2, $3, $4);
+				INSERT INTO schema_migrations (Version, Name, Status, StatusChangeTime)
+				VALUES ($1, $2, $3, $4);
 			END IF;
 		END $$;`
 
