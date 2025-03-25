@@ -40,7 +40,7 @@ var (
 )
 
 // Конструктор для создания нового объекта Migrator.
-func New(connString storage.sqlStorage, logger logger.Logger) *Migrator {
+func New(connString storage.SQLStorage, logger logger.Logger) *Migrator {
 	return &Migrator{
 		storage:    connString,
 		logger:     logger,
@@ -97,7 +97,7 @@ func (m *Migrator) Up(ctx context.Context) error {
 		m.logger.Error("Ошибка при блокировке: %v", err)
 		return err
 	}
-	defer func(storage storage.sqlStorage, ctx context.Context) {
+	defer func(storage storage.SQLStorage, ctx context.Context) {
 		err := storage.Unlock(ctx)
 		if err != nil {
 			m.logger.Error("Ошибка при разблокировке: %v", err)
@@ -137,7 +137,7 @@ func (m *Migrator) Down(ctx context.Context) error {
 		m.logger.Error("Ошибка при блокировке: %v", err)
 		return err
 	}
-	defer func(storage storage.sqlStorage, ctx context.Context) {
+	defer func(storage storage.SQLStorage, ctx context.Context) {
 		err := storage.Unlock(ctx)
 		if err != nil {
 			m.logger.Error("Ошибка при разблокировке: %v", err)

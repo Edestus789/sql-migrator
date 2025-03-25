@@ -5,33 +5,33 @@ import (
 	"errors"
 )
 
-type MocksqlStorage struct {
+type MockSQLStorage struct {
 	migrations []IMigration
 }
 
-func NewMocksqlStorage() *MocksqlStorage {
-	return &MocksqlStorage{
+func NewMockSQLStorage() *MockSQLStorage {
+	return &MockSQLStorage{
 		migrations: []IMigration{},
 	}
 }
 
-func (m *MocksqlStorage) Connect(_ context.Context) error {
+func (m *MockSQLStorage) Connect(_ context.Context) error {
 	return nil
 }
 
-func (m *MocksqlStorage) Close() error {
+func (m *MockSQLStorage) Close() error {
 	return nil
 }
 
-func (m *MocksqlStorage) Lock(_ context.Context) error {
+func (m *MockSQLStorage) Lock(_ context.Context) error {
 	return nil
 }
 
-func (m *MocksqlStorage) Unlock(_ context.Context) error {
+func (m *MockSQLStorage) Unlock(_ context.Context) error {
 	return nil
 }
 
-func (m *MocksqlStorage) InsertMigration(ctx context.Context, migration IMigration) error {
+func (m *MockSQLStorage) InsertMigration(ctx context.Context, migration IMigration) error {
 	for _, m := range m.migrations {
 		if m.GetVersion() == migration.GetVersion() && m.GetName() == migration.GetName() {
 			m.SetStatus(migration.GetStatus())
@@ -45,7 +45,7 @@ func (m *MocksqlStorage) InsertMigration(ctx context.Context, migration IMigrati
 	return nil
 }
 
-func (m *MocksqlStorage) UpdateMigration(ctx context.Context, migration IMigration) error {
+func (m *MockSQLStorage) UpdateMigration(ctx context.Context, migration IMigration) error {
 	for _, m := range m.migrations {
 		if m.GetVersion() == migration.GetVersion() && m.GetName() == migration.GetName() {
 			m.SetStatus(migration.GetStatus())
@@ -56,18 +56,18 @@ func (m *MocksqlStorage) UpdateMigration(ctx context.Context, migration IMigrati
 	return errors.New("migration not found")
 }
 
-func (m *MocksqlStorage) Migrate(ctx context.Context, sql string) error {
+func (m *MockSQLStorage) Migrate(ctx context.Context, sql string) error {
 	return nil
 }
 
-func (m *MocksqlStorage) SelectMigrations(ctx context.Context) ([]IMigration, error) {
+func (m *MockSQLStorage) SelectMigrations(ctx context.Context) ([]IMigration, error) {
 	if len(m.migrations) == 0 {
 		return nil, errors.New("no migrations found")
 	}
 	return m.migrations, nil
 }
 
-func (m *MocksqlStorage) SelectLastMigrationByStatus(ctx context.Context, status string) (IMigration, error) {
+func (m *MockSQLStorage) SelectLastMigrationByStatus(ctx context.Context, status string) (IMigration, error) {
 	for i := len(m.migrations) - 1; i >= 0; i-- {
 		if m.migrations[i].GetStatus() == status {
 			return m.migrations[i], nil
@@ -76,7 +76,7 @@ func (m *MocksqlStorage) SelectLastMigrationByStatus(ctx context.Context, status
 	return nil, errors.New("no migrations found with status " + status)
 }
 
-func (m *MocksqlStorage) DeleteMigrations(ctx context.Context) error {
+func (m *MockSQLStorage) DeleteMigrations(ctx context.Context) error {
 	m.migrations = []IMigration{}
 	return nil
 }

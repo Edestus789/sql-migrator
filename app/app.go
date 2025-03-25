@@ -27,7 +27,7 @@ type App interface {
 
 type Application struct {
 	logger     logger.Logger
-	sqlStorage storage.sqlStorage
+	SQLStorage storage.sqlStorage
 }
 
 var (
@@ -40,10 +40,10 @@ var (
 	regGetDownGoMigration = regexp.MustCompile(`^.+_down\.go$`)
 )
 
-func New(logger logger.Logger, sqlStorage storage.sqlStorage) *Application {
+func New(logger logger.Logger, SQLStorage storage.SQLStorage) *Application {
 	return &Application{
 		logger:     logger,
-		sqlStorage: sqlStorage,
+		SQLStorage: SQLStorage,
 	}
 }
 
@@ -98,7 +98,7 @@ func (app *Application) DBVersion() {
 }
 
 func (app *Application) runMigrations(filePath string, migrationFunc func(*processes.Migrator, context.Context) error) {
-	migrator := processes.New(app.sqlStorage, app.logger)
+	migrator := processes.New(app.SQLStorage, app.logger)
 	migrations, err := getMigrations(filePath)
 	if err != nil {
 		app.logger.Fatal("Failed to get migrations: ", err)
@@ -122,7 +122,7 @@ func (app *Application) runMigrations(filePath string, migrationFunc func(*proce
 }
 
 func (app *Application) runSingleCommand(commandFunc func(*processes.Migrator, context.Context) error) {
-	migrator := processes.New(app.sqlStorage, app.logger)
+	migrator := processes.New(app.SQLStorage, app.logger)
 	ctx := context.Background()
 	if err := migrator.Connect(ctx); err != nil {
 		app.logger.Fatal("Failed to connect to database: ", err)
@@ -183,7 +183,7 @@ import (
 )
 
 func Up(ctx context.Context) error {
-	db, ok := ctx.Value("db").(*storage.sqlStorage)
+	db, ok := ctx.Value("db").(*storage.SQLStorage)
 	if !ok {
 		return fmt.Errorf("could not get database connection from context")
 	}
@@ -219,7 +219,7 @@ import (
 )
 
 func Down(ctx context.Context) error {
-	db, ok := ctx.Value("db").(*storage.sqlStorage)
+	db, ok := ctx.Value("db").(*storage.SQLStorage)
 	if !ok {
 		return fmt.Errorf("could not get database connection from context")
 	}
