@@ -44,7 +44,7 @@ var (
 	ErrMigrationNotFound = errors.New("processes not found")
 )
 
-func New(connString string, logger logger.Logger) *PostgresStorage {
+func NewPostgresStorage(connString string, logger logger.Logger) *PostgresStorage {
 	return &PostgresStorage{
 		connString: connString,
 		logger:     logger,
