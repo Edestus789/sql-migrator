@@ -25,7 +25,7 @@ type IMigration interface {
 // Структура Migrator реализует интерфейс IMigration.
 type Migrator struct {
 	logger     logger.Logger
-	storage    storage.SQLStorage
+	storage    storage.sqlStorage
 	migrations []storage.Migration
 }
 
