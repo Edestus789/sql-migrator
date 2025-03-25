@@ -76,7 +76,8 @@ func (storage *PostgresStorage) Connect(ctx context.Context) error {
 	}
 
 	storage.pool = pool
-	storage.logger.Info("Connected to the database and ensured schema_migrations table exists")
+	storage.logger.Info("Connected to the database and " +
+		"ensured schema_migrations table exists")
 	return nil
 }
 
@@ -168,7 +169,11 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		return nil, ErrUnexpectedStatus
 	}
 
-	sql := `SELECT Name, Status, Version, StatusChangeTime FROM schema_migrations WHERE Status = $1 ORDER BY Version DESC LIMIT 1;`
+	sql := `SELECT Name, Status, Version, StatusChangeTime 
+        FROM schema_migrations 
+        WHERE Status = $1 
+        ORDER BY Version DESC 
+        LIMIT 1;`
 
 	row := storage.pool.QueryRow(ctx, sql, status)
 
