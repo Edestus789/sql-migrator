@@ -56,7 +56,6 @@ func (storage *PostgresStorage) Connect(ctx context.Context) error {
 
 	pool, err := pgxpool.Connect(ctx, storage.connString)
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to connect to the database: %v", err)
 		return err
 	}
@@ -71,7 +70,6 @@ func (storage *PostgresStorage) Connect(ctx context.Context) error {
 
 	_, err = pool.Exec(ctx, sql)
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to create schema_migrations table: %v", err)
 		pool.Close()
 		return err
@@ -99,7 +97,6 @@ func (storage *PostgresStorage) Lock(ctx context.Context) error {
 		"SELECT pg_advisory_lock($1);",
 		advisoryLockID)
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to acquire advisory lock: %v", err)
 	}
 	return err
@@ -111,7 +108,6 @@ func (storage *PostgresStorage) Unlock(ctx context.Context) error {
 		"SELECT pg_advisory_unlock($1);",
 		advisoryLockID)
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to release advisory lock: %v", err)
 	}
 	return err
@@ -121,7 +117,6 @@ func (storage *PostgresStorage) DeleteMigrations(ctx context.Context) error {
 	storage.logger.Info("Deleting all migrations from schema_migrations table")
 	_, err := storage.pool.Exec(ctx, "TRUNCATE schema_migrations;")
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to delete migrations: %v", err)
 	}
 	return err
@@ -133,7 +128,6 @@ func (storage *PostgresStorage) SelectMigrations(ctx context.Context) ([]IMigrat
 
 	rows, err := storage.pool.Query(ctx, sql)
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to select migrations: %v", err)
 		return nil, err
 	}
@@ -150,7 +144,6 @@ func (storage *PostgresStorage) SelectMigrations(ctx context.Context) ([]IMigrat
 
 		err = rows.Scan(&name, &status, &version, &statusChangeTime)
 		if err != nil {
-			//nolint:lll
 			storage.logger.Error("Failed to scan migration row: %v", err)
 			return nil, err
 		}
@@ -176,7 +169,6 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 		return nil, ErrUnexpectedStatus
 	}
 
-	//nolint:lll
 	sql := `SELECT Name, Status, Version, StatusChangeTime 
         FROM schema_migrations 
         WHERE Status = $1 
@@ -212,7 +204,6 @@ func (storage *PostgresStorage) SelectLastMigrationByStatus(ctx context.Context,
 func (storage *PostgresStorage) InsertMigration(ctx context.Context, migration IMigration) error {
 	storage.logger.Info("Inserting/updating migration: %s", migration.GetName())
 
-	//nolint:lll
 	sql := `
 		DO $$ 
 		BEGIN
@@ -230,7 +221,6 @@ func (storage *PostgresStorage) InsertMigration(ctx context.Context, migration I
 
 	_, err := storage.pool.Exec(ctx, sql, migration.GetVersion(), migration.GetName(), migration.GetStatus(), migration.GetStatusChangeTime())
 	if err != nil {
-		//nolint:lll
 		storage.logger.Error("Failed to insert/update migration: %v", err)
 	}
 	return err
