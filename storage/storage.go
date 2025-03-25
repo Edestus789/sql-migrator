@@ -13,7 +13,7 @@ import (
 // Он должен быть уникальным для приложения и не пересекаться с другими существующими возможными блокировками в бд.
 const advisoryLockID = 123456
 
-type sqlStorage interface {
+type SQLStorage interface {
 	Connect(ctx context.Context) error
 	Close() error
 	Lock(ctx context.Context) error
