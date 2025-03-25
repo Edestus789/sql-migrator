@@ -27,7 +27,7 @@ type App interface {
 
 type Application struct {
 	logger     logger.Logger
-	SQLStorage storage.sqlStorage
+	SQLStorage storage.SQLStorage
 }
 
 var (
