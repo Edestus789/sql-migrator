@@ -7,8 +7,13 @@ GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
 
 generate-config:
-	@cp sample-config.yaml ${CONFIG_FILE}
-	@echo "Конфиг создан: ${CONFIG_FILE}"
+	@if [ ! -f config.yaml ]; then \
+		cp sample-config.yaml config.yaml; \
+		echo "Created config.yaml from sample-config.yaml"; \
+		echo "Please edit config.yaml with your settings"; \
+	else \
+		echo "config.yaml already exists"; \
+	fi
 
 test:
 	go test -race ./app
@@ -32,7 +37,14 @@ $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
 migrate-create:
-	$(BIN_MIGRATOR) create $(name)
+ifndef name
+	$(error "name" variable is not set. Usage: make migrate-create name=migration_name)
+endif
+	$(BIN_MIGRATOR) --command=create --name=$(name) \
+		$(if $(CONFIG), --config=$(CONFIG)) \
+		$(if $(PATH), --path=$(PATH)) \
+		$(if $(DSN), --dsn=$(DSN)) \
+		$(if $(TYPE), --type=$(TYPE))
 
 migrate-up:
 	$(BIN_MIGRATOR) up

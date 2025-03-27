@@ -3,46 +3,66 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Migrator struct {
-		DSN       string `mapstructure:"dsn"`
-		Dir       string `mapstructure:"dir"`
-		Type      string `mapstructure:"type"`
-		TableName string `mapstructure:"table_name"`
-	} `mapstructure:"migrator"`
-	Logger struct {
-		Level string `mapstructure:"level"`
-	} `mapstructure:"logger"`
+	MigratorOpt *Migrator
+	LoggerOpt   *Logger
+}
+
+type Migrator struct {
+	DSN       string `mapstructure:"dsn"`
+	Dir       string `mapstructure:"dir"`
+	Type      string `mapstructure:"type"`
+	TableName string `mapstructure:"table_name"`
+}
+
+type Logger struct {
+	Level string `mapstructure:"level"`
 }
 
 func LoadConfig(configPath string) (*Config, error) {
-	viper.SetConfigFile(configPath)
-	viper.SetConfigType(filepath.Ext(configPath)[1:]) // auto-detect format
+	v := viper.New()
 
-	// Enable env vars expansion
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("error reading config: %w", err)
+	// Если путь к конфигу явно не указан, ищем в текущей директории
+	if configPath == "" {
+		v.SetConfigName("config") // Имя файла без расширения
+		v.AddConfigPath(".")      // Ищем в текущей директории
+		v.SetConfigType("yaml")   // Поддерживаемые типы: yaml, json, toml и т.д.
+	} else {
+		v.SetConfigFile(configPath)
 	}
 
-	// Expand environment variables in config
-	for _, key := range viper.AllKeys() {
-		value := viper.GetString(key)
+	// Читаем конфиг
+	if err := v.ReadInConfig(); err != nil {
+		if configPath == "" {
+			// Если конфиг не указан и не найден - возвращаем дефолтные значения
+			return &Config{
+				MigratorOpt: &Migrator{
+					Dir:       "./migrations",
+					Type:      "sql",
+					TableName: "schema_migrations",
+				},
+				LoggerOpt: &Logger{
+					Level: "info",
+				},
+			}, nil
+		}
+		return nil, fmt.Errorf("error reading config file: %w", err)
+	}
+
+	// Заменяем переменные окружения в значениях конфига
+	for _, key := range v.AllKeys() {
+		value := v.GetString(key)
 		expanded := os.ExpandEnv(value)
-		viper.Set(key, expanded)
+		v.Set(key, expanded)
 	}
 
 	var cfg Config
-	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("config unmarshal error: %w", err)
+	if err := v.Unmarshal(&cfg); err != nil {
+		return nil, fmt.Errorf("error unmarshaling config: %w", err)
 	}
 
 	return &cfg, nil
