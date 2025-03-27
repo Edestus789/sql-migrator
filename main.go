@@ -102,22 +102,20 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println(`
-Usage:
-  gomigrator [flags] <command> [arguments]
-
-Commands:
-  create <name>    Create new migration
-  up               Apply all migrations
-  down             Rollback last migration
-  redo             Redo last migration
-  status           Show migration status
-  dbversion        Show current database version
-
-Flags:
-  --config string  Path to config file (default "./config.yaml")
-  --path string    Path to migrations directory
-  --dsn string     Database connection string
-  --type string    Migration type: sql or go
-`)
+	fmt.Println("Usage:")
+	fmt.Println("  gomigrator [flags] <command> [arguments]")
+	fmt.Println()
+	fmt.Println("Commands:")
+	fmt.Println("  create <name>    Create new migration")
+	fmt.Println("  up               Apply all migrations")
+	fmt.Println("  down             Rollback last migration")
+	fmt.Println("  redo             Redo last migration")
+	fmt.Println("  status           Show migration status")
+	fmt.Println("  dbversion        Show current database version")
+	fmt.Println()
+	fmt.Println("Flags:")
+	fmt.Println("  --config string  Path to config file (default \"./config.yaml\")")
+	fmt.Println("  --path string    Path to migrations directory")
+	fmt.Println("  --dsn string     Database connection string")
+	fmt.Println("  --type string    Migration type: sql or go")
 }
