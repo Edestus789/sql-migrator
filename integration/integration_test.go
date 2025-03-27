@@ -3,8 +3,6 @@
 
 package integration
 
-package integration
-
 import (
 	"context"
 	"database/sql"
@@ -42,7 +40,7 @@ func setup() *storage.PostgresStorage {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		dbUser, dbPassword, dbHost, dbPort, dbName)
 
-	storage := storage.NewPostgresStorage(connStr, logger) // Исправлено с storage.New на storage.NewPostgresStorage
+	storage := storage.New(connStr, logger)
 	ctx := context.Background()
 	if err := storage.Connect(ctx); err != nil {
 		log.Fatal(err)

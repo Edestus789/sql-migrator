@@ -19,7 +19,7 @@ test:
 	go test -race ./app
 
 integration-tests:
-	go test -tags=integration ./integration
+	go test ./integration
 
 install-lint-deps:
 	export GOROOT=$(go env GOROOT)
@@ -36,24 +36,41 @@ build-migrator: $(BIN_DIR)
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
-# Пример команды с дефолтным именем для тестов
 migrate-create:
-	$(BIN_MIGRATOR) create test_migration_$(shell date +%s)
+ifndef name
+	$(error "name" variable is not set. Usage: make migrate-create name=migration_name)
+endif
+	$(BIN_MIGRATOR) create $(name) \
+		$(if $(CONFIG), --config=$(CONFIG)) \
+		$(if $(PATH), --path=$(PATH)) \
+		$(if $(DSN), --dsn=$(DSN)) \
+		$(if $(TYPE), --type=$(TYPE))
 
 migrate-up:
-	$(BIN_MIGRATOR) up
+	$(BIN_MIGRATOR) up \
+		$(if $(CONFIG), --config=$(CONFIG)) \
+		$(if $(PATH), --path=$(PATH)) \
+		$(if $(DSN), --dsn=$(DSN))
 
 migrate-down:
-	$(BIN_MIGRATOR) down
+	$(BIN_MIGRATOR) down \
+		$(if $(CONFIG), --config=$(CONFIG)) \
+		$(if $(PATH), --path=$(PATH)) \
+		$(if $(DSN), --dsn=$(DSN))
 
 migrate-redo:
-	$(BIN_MIGRATOR) redo
+	$(BIN_MIGRATOR) redo \
+		$(if $(CONFIG), --config=$(CONFIG)) \
+		$(if $(PATH), --path=$(PATH)) \
+		$(if $(DSN), --dsn=$(DSN))
 
 migrate-status:
-	$(BIN_MIGRATOR) status
+	$(BIN_MIGRATOR) status \
+		$(if $(CONFIG), --config=$(CONFIG))
 
 migrate-dbversion:
-	$(BIN_MIGRATOR) dbversion
+	$(BIN_MIGRATOR) dbversion \
+		$(if $(CONFIG), --config=$(CONFIG))
 
 postgres:
 	docker run --name postgresdb --env POSTGRES_PASSWORD="1234512345" --publish "5436:5432" --detach --rm postgres
