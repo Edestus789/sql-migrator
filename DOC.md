@@ -85,17 +85,6 @@ export MIGRATIONS_DIR="/opt/migrations"
 gomigrator --config config.yaml up
 ```
 
-# Использование конфига по умолчанию (./config.yaml)
-gomigrator --command=up
-
-# Явное указание конфига
-gomigrator --config=./custom-config.yaml --command=up
-
-# Переопределение параметров из командной строки
-gomigrator --command=up --dsn="postgres://user:pass@localhost/db" --path=./my-migrations
-
-
-
 Или через аргументы:
 ```bash
 gomigrator --dsn "postgresql://user:pass@localhost:5432/db" --path ./migrations up
