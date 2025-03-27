@@ -1,10 +1,14 @@
 BIN_DIR := "/bin"
 BIN_MIGRATOR := "./bin/gomigrator"
-
 MAIN_MIGRATOR := "./cmd/gomigrator"
+CONFIG_FILE ?= "config.yaml" # Дефолтный конфиг в YAML
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
+
+generate-config:
+	@cp sample-config.yaml ${CONFIG_FILE}
+	@echo "Конфиг создан: ${CONFIG_FILE}"
 
 test:
 	go test -race ./app

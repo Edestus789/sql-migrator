@@ -47,13 +47,13 @@ func main() {
 	}
 
 	if path == "" {
-		path = config.MigratorOpt.Dir
+		path = config.Migrator.Dir
 	} else {
 		path = os.ExpandEnv(path)
 	}
 
 	if database == "" {
-		database = config.MigratorOpt.DSN
+		database = config.Migrator.DSN
 	} else {
 		database = os.ExpandEnv(database)
 	}

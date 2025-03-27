@@ -55,16 +55,34 @@ gomigrator dbversion
 Показывает номер последней примененной миграции.
 
 ## Конфигурация
-Настройки в `config.toml`:
-```toml
-[migrator]
-dsn = "postgresql://user:pass@localhost:5432/db" # DSN подключения
-dir = "./migrations"                            # Путь к миграциям
-type = "sql"                                    # Тип миграций (sql/go)
-table_name = "schema_migrations"                # Таблица для учета миграций
+Настройки в `config.yaml`:
+```yaml
+# SQL Migrator Configuration
+# Environment variables can be used as ${VAR_NAME}
 
-[logger]
-level = "INFO"                                  # Уровень логирования
+migrator:
+  # Connection string (can use env vars)
+  dsn: "${DB_DSN:-postgresql://user:pass@localhost:5432/default_db?sslmode=disable}"
+  
+  # Migrations directory
+  dir: "${MIGRATIONS_DIR:-./migrations}"
+  
+  # Migration type: sql or go
+  type: "${MIGR_TYPE:-sql}"
+  
+  # Migrations table name
+  table_name: "schema_migrations"
+
+logger:
+  # Log level: debug, info, warn, error, fatal
+  level: "${LOG_LEVEL:-info}"
+```
+###  Примеры использования
+
+```bash
+export DB_DSN="postgresql://user:pass@prod-db:5432/prod_db"
+export MIGRATIONS_DIR="/opt/migrations"
+gomigrator --config config.yaml up
 ```
 
 Или через аргументы:
