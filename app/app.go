@@ -17,12 +17,12 @@ import (
 )
 
 type App interface {
-	Create(name, path string, migrationType string) error
-	Up(path string) error
-	Down(path string) error
-	Redo(path string) error
-	Status() error
-	DBVersion() error
+	Create(name, path string, migrationType string)
+	Up(path string)
+	Down(path string)
+	Redo(path string)
+	Status()
+	DBVersion()
 }
 
 type Application struct {
@@ -32,9 +32,6 @@ type Application struct {
 
 var (
 	ErrInvalidMigrationName = errors.New("invalid migration name")
-	ErrMigrationFileExists  = errors.New("migration file already exists")
-	ErrMigrationFailed      = errors.New("migration failed")
-	ErrNoMigrationsFound    = errors.New("no migrations found")
 
 	regGetVersion         = regexp.MustCompile(`^\d+`)
 	regGetUpMigration     = regexp.MustCompile(`^.+_up\.sql$`)
@@ -50,39 +47,62 @@ func New(logger logger.Logger, SQLStorage storage.SQLStorage) *Application {
 	}
 }
 
-func (app *Application) Create(name, filePath, migrationType string) error {
-	if strings.TrimSpace(name) == "" {
-		return ErrInvalidMigrationName
-	}
-
+func (app *Application) Create(name, filePath, migrationType string) {
 	files, err := os.ReadDir(filePath)
 	if err != nil {
-		app.logger.Error("Failed to read directory: %v", err)
-		return err
+		app.logger.Fatal("Failed to read directory: ", err)
+		return
 	}
 
 	lastVersion := getLastVersion(files, app.logger)
-	newVersion := lastVersion + 1
-
-	if err := createMigrationFiles(filePath, newVersion, name, app.logger, migrationType); err != nil {
-		app.logger.Error("Failed to create migration files: %v", err)
-		return err
+	if lastVersion < 0 {
+		return
 	}
 
-	app.logger.Info("Created migration %s version %d", name, newVersion)
-	return nil
+	lastVersion++
+
+	if err := createMigrationFiles(filePath, lastVersion, name, app.logger, migrationType); err != nil {
+		app.logger.Fatal("Failed to create migration files: ", err)
+	}
 }
 
-func (app *Application) Up(filePath string) error {
+func (app *Application) Up(filePath string) {
+	app.runMigrations(filePath, func(migrator *processes.Migrator, ctx context.Context) error {
+		return migrator.Up(ctx)
+	})
+}
+
+func (app *Application) Down(filePath string) {
+	app.runMigrations(filePath, func(migrator *processes.Migrator, ctx context.Context) error {
+		return migrator.Down(ctx)
+	})
+}
+
+func (app *Application) Redo(filePath string) {
+	app.runMigrations(filePath, func(migrator *processes.Migrator, ctx context.Context) error {
+		return migrator.Redo(ctx)
+	})
+}
+
+func (app *Application) Status() {
+	app.runSingleCommand(func(migrator *processes.Migrator, ctx context.Context) error {
+		return migrator.Status(ctx)
+	})
+}
+
+// DbVersion выводит текущую версию базы данных.
+func (app *Application) DBVersion() {
+	app.runSingleCommand(func(migrator *processes.Migrator, ctx context.Context) error {
+		return migrator.DBVersion(ctx)
+	})
+}
+
+func (app *Application) runMigrations(filePath string, migrationFunc func(*processes.Migrator, context.Context) error) {
 	migrator := processes.New(app.SQLStorage, app.logger)
 	migrations, err := getMigrations(filePath)
 	if err != nil {
-		app.logger.Error("Failed to get migrations: %v", err)
-		return err
-	}
-
-	if len(migrations) == 0 {
-		return ErrNoMigrationsFound
+		app.logger.Fatal("Failed to get migrations: ", err)
+		return
 	}
 
 	for _, migration := range migrations {
@@ -91,113 +111,28 @@ func (app *Application) Up(filePath string) error {
 
 	ctx := context.Background()
 	if err := migrator.Connect(ctx); err != nil {
-		app.logger.Error("Failed to connect to database: %v", err)
-		return err
+		app.logger.Fatal("Failed to connect to database: ", err)
+		return
 	}
 	defer migrator.Close(ctx)
 
-	if err := migrator.Up(ctx); err != nil {
-		app.logger.Error("Migration up failed: %v", err)
-		return ErrMigrationFailed
+	if err := migrationFunc(migrator, ctx); err != nil {
+		app.logger.Error("Migration failed: ", err)
 	}
-
-	return nil
 }
 
-func (app *Application) Down(filePath string) error {
-	migrator := processes.New(app.SQLStorage, app.logger)
-	migrations, err := getMigrations(filePath)
-	if err != nil {
-		app.logger.Error("Failed to get migrations: %v", err)
-		return err
-	}
-
-	if len(migrations) == 0 {
-		return ErrNoMigrationsFound
-	}
-
-	for _, migration := range migrations {
-		migrator.Create(migration.Name, migration.Up, migration.Down, migration.UpGo, migration.DownGo)
-	}
-
-	ctx := context.Background()
-	if err := migrator.Connect(ctx); err != nil {
-		app.logger.Error("Failed to connect to database: %v", err)
-		return err
-	}
-	defer migrator.Close(ctx)
-
-	if err := migrator.Down(ctx); err != nil {
-		app.logger.Error("Migration down failed: %v", err)
-		return ErrMigrationFailed
-	}
-
-	return nil
-}
-
-func (app *Application) Redo(filePath string) error {
-	migrator := processes.New(app.SQLStorage, app.logger)
-	migrations, err := getMigrations(filePath)
-	if err != nil {
-		app.logger.Error("Failed to get migrations: %v", err)
-		return err
-	}
-
-	if len(migrations) == 0 {
-		return ErrNoMigrationsFound
-	}
-
-	for _, migration := range migrations {
-		migrator.Create(migration.Name, migration.Up, migration.Down, migration.UpGo, migration.DownGo)
-	}
-
-	ctx := context.Background()
-	if err := migrator.Connect(ctx); err != nil {
-		app.logger.Error("Failed to connect to database: %v", err)
-		return err
-	}
-	defer migrator.Close(ctx)
-
-	if err := migrator.Redo(ctx); err != nil {
-		app.logger.Error("Migration redo failed: %v", err)
-		return ErrMigrationFailed
-	}
-
-	return nil
-}
-
-func (app *Application) Status() error {
+func (app *Application) runSingleCommand(commandFunc func(*processes.Migrator, context.Context) error) {
 	migrator := processes.New(app.SQLStorage, app.logger)
 	ctx := context.Background()
 	if err := migrator.Connect(ctx); err != nil {
-		app.logger.Error("Failed to connect to database: %v", err)
-		return err
+		app.logger.Fatal("Failed to connect to database: ", err)
+		return
 	}
 	defer migrator.Close(ctx)
 
-	if err := migrator.Status(ctx); err != nil {
-		app.logger.Error("Failed to get migration status: %v", err)
-		return err
+	if err := commandFunc(migrator, ctx); err != nil {
+		app.logger.Error("Command failed: ", err)
 	}
-
-	return nil
-}
-
-func (app *Application) DBVersion() error {
-	migrator := processes.New(app.SQLStorage, app.logger)
-	ctx := context.Background()
-	if err := migrator.Connect(ctx); err != nil {
-		app.logger.Error("Failed to connect to database: %v", err)
-		return err
-	}
-	defer migrator.Close(ctx)
-
-	if err := migrator.DBVersion(ctx); err != nil {
-		app.logger.Error("Failed to get database version: %v", err)
-		return err
-	}
-
-	return nil
 }
 
 func getLastVersion(files []os.DirEntry, logger logger.Logger) int {

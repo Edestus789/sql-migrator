@@ -24,8 +24,8 @@ const (
 	dbPort     = "5432"
 )
 
-func setupTestDB(t *testing.T) (*sql.DB, string) {
-	t.Helper()
+func TestMigrations(t *testing.T) {
+	// Настройка тестовой БД
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 
@@ -33,31 +33,26 @@ func setupTestDB(t *testing.T) (*sql.DB, string) {
 	if err != nil {
 		t.Fatalf("Failed to connect to test database: %v", err)
 	}
-	return db, connStr
-}
-
-func TestMigrations(t *testing.T) {
-	db, connStr := setupTestDB(t)
 	defer db.Close()
 
-	// Setup migrator
+	// Инициализация мигратора
 	log := logger.New()
-	store := storage.NewPostgresStorage(connStr, log)
+	storage := storage.NewPostgresStorage(connStr, log)
 	ctx := context.Background()
 
-	if err := store.Connect(ctx); err != nil {
+	if err := storage.Connect(ctx); err != nil {
 		t.Fatalf("Failed to connect storage: %v", err)
 	}
-	defer store.Close()
+	defer storage.Close()
 
-	// Prepare test migrations
+	// Подготовка тестовых миграций
 	migrationDir := "./test_migrations"
 	if err := os.MkdirAll(migrationDir, 0755); err != nil {
 		t.Fatalf("Failed to create migrations dir: %v", err)
 	}
 	defer os.RemoveAll(migrationDir)
 
-	// Create test migration files
+	// Создаем тестовые миграции
 	upSQL := "CREATE TABLE IF NOT EXISTS test_table (id SERIAL PRIMARY KEY);"
 	downSQL := "DROP TABLE IF EXISTS test_table;"
 
@@ -71,38 +66,32 @@ func TestMigrations(t *testing.T) {
 		t.Fatalf("Failed to create down migration: %v", err)
 	}
 
-	// Initialize app
-	application := app.New(log, store)
+	// Тестируем миграции
+	app := app.New(log, storage)
 
-	// Test Up
 	t.Run("Apply migrations", func(t *testing.T) {
-		if err := application.Up(migrationDir); err != nil {
+		if err := app.Up(migrationDir); err != nil {
 			t.Fatalf("Up failed: %v", err)
 		}
 
+		// Проверяем, что таблица создана
 		var exists bool
 		err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = 'test_table')").Scan(&exists)
-		if err != nil {
-			t.Fatalf("Check table failed: %v", err)
-		}
-		if !exists {
-			t.Fatal("Table was not created")
+		if err != nil || !exists {
+			t.Fatalf("Table not created: %v", err)
 		}
 	})
 
-	// Test Down
 	t.Run("Rollback migrations", func(t *testing.T) {
-		if err := application.Down(migrationDir); err != nil {
+		if err := app.Down(migrationDir); err != nil {
 			t.Fatalf("Down failed: %v", err)
 		}
 
+		// Проверяем, что таблица удалена
 		var exists bool
 		err := db.QueryRow("SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = 'test_table')").Scan(&exists)
-		if err != nil {
-			t.Fatalf("Check table failed: %v", err)
-		}
-		if exists {
-			t.Fatal("Table was not dropped")
+		if err != nil || exists {
+			t.Fatalf("Table not dropped: %v", err)
 		}
 	})
 }
