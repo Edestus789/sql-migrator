@@ -1,0 +1,19 @@
+# SQL Migrator Configuration
+# Environment variables can be used as ${VAR_NAME}
+
+migrator:
+  # Connection string (can use env vars)
+  dsn: "${DB_DSN:-postgresql://user:pass@localhost:5432/default_db?sslmode=disable}"
+  
+  # Migrations directory
+  dir: "${MIGRATIONS_DIR:-./migrations}"
+  
+  # Migration type: sql or go
+  type: "${MIGR_TYPE:-sql}"
+  
+  # Migrations table name
+  table_name: "schema_migrations"
+
+logger:
+  # Log level: debug, info, warn, error, fatal
+  level: "${LOG_LEVEL:-info}"
